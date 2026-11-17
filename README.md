@@ -1,109 +1,109 @@
-# Sistema embebido de monitoreo de proximidad y alerta multimodal
+# Embedded Proximity Monitoring and Multimodal Alert System
 
-Prototipo basado en **Arduino Uno** que detecta si un espacio está ocupado midiendo la distancia con un sensor ultrasónico y señaliza el resultado con luces y sonido. Fue diseñado, simulado en Tinkercad y montado sobre una **maqueta a escala 1:10** de un cubículo de estudio de la Facultad de Ingeniería de la Universidad de San Buenaventura, sede Bogotá.
+An **Arduino Uno**-based prototype that detects whether a space is occupied by measuring distance with an ultrasonic sensor, and signals the result with lights and sound. It was designed, simulated in Tinkercad, and mounted on a **1:10 scale model** of a study cubicle at the Faculty of Engineering of Universidad de San Buenaventura, Bogotá campus.
 
-Proyecto del curso de Circuitos Digitales.
+Project for the Digital Circuits course.
 
-![Simulación en Tinkercad](docs/simulacion_tinkercad.png)
+![Tinkercad simulation](docs/simulacion_tinkercad.png)
 
-## Problemática
+## Problem Statement
 
-En los cubículos de estudio y las zonas de laboratorio de la Facultad de Ingeniería hay problemas de saturación y de gestión del espacio en las franjas de mayor afluencia: los usuarios no cuentan con una señalización que les indique en tiempo real si un puesto está disponible u ocupado. Los carteles estáticos o las reservas en papel no se adaptan a la dinámica del campus.
+In the study cubicles and laboratory areas of the Faculty of Engineering, space is oversaturated and poorly managed during peak hours: users have no signage telling them in real time whether a spot is available or occupied. Static posters and paper reservations do not adapt to the changing dynamics of the campus.
 
-Este sistema mide la ocupación de forma local y continua, y la comunica de inmediato con indicadores luminosos y acústicos, a bajo costo y sin depender de infraestructura de red.
+This system measures occupancy locally and continuously, and communicates it immediately with visual and acoustic indicators, at low cost and without relying on network infrastructure.
 
-## Cómo funciona
+## How It Works
 
-1. El sensor **PING)))** mide la distancia al objeto o persona más cercana.
-2. Un **potenciómetro** fija el umbral de detección, de 0 a 100 cm.
-3. Si la distancia es menor o igual al umbral, se enciende el **LED rojo** (ocupado); si no, el **LED verde** (libre).
-4. Cada vez que el estado **cambia** (entra o sale del umbral) suena el **zumbador** durante menos de un segundo.
-5. Un **pulsador** silencia o reactiva el zumbador; los LED siguen funcionando.
-6. En cada ciclo se envía por **UART** (9600 bps) una línea de telemetría al monitor serial.
+1. The **PING)))** sensor measures the distance to the nearest object or person.
+2. A **potentiometer** sets the detection threshold, from 0 to 100 cm.
+3. If the distance is less than or equal to the threshold, the **red LED** turns on (occupied); otherwise, the **green LED** turns on (free).
+4. Every time the state **changes** (enters or leaves the threshold), the **buzzer** sounds for less than one second.
+5. A **pushbutton** mutes or re-enables the buzzer; the LEDs keep working.
+6. In every cycle, a telemetry line is sent over **UART** (9600 bps) to the serial monitor.
 
-## Lista de componentes
+## Components List
 
-| Cantidad | Componente | Función |
+| Qty | Component | Function |
 |:--:|---|---|
-| 1 | Arduino Uno (ATmega328P) y cable USB | Microcontrolador y alimentación |
-| 1 | Sensor ultrasónico PING))) | Medición de distancia (tiempo de vuelo) |
-| 1 | Potenciómetro | Ajuste del umbral (entrada analógica) |
-| 1 | Pulsador | Silenciar / reactivar el zumbador |
-| 1 | Resistencia de 10 kΩ | *Pull-down* externo del pulsador |
-| 1 | LED verde | Espacio libre |
-| 1 | LED rojo | Espacio ocupado / umbral superado |
-| 2 | Resistencias de 220 Ω | Limitación de corriente de los LED |
-| 1 | Zumbador piezoeléctrico | Alerta acústica |
-| 1 | Protoboard y cables | Conexiones |
-| 1 | Maqueta a escala 1:10 | Soporte e integración del sistema |
+| 1 | Arduino Uno (ATmega328P) and USB cable | Microcontroller and power supply |
+| 1 | PING))) ultrasonic sensor | Distance measurement (time of flight) |
+| 1 | Potentiometer | Threshold adjustment (analog input) |
+| 1 | Pushbutton | Mute / re-enable the buzzer |
+| 1 | 10 kΩ resistor | External *pull-down* for the pushbutton |
+| 1 | Green LED | Free space |
+| 1 | Red LED | Occupied space / threshold exceeded |
+| 2 | 220 Ω resistors | LED current limiting |
+| 1 | Piezoelectric buzzer | Acoustic alert |
+| 1 | Breadboard and wires | Connections |
+| 1 | 1:10 scale model | Support and system integration |
 
-## Diagrama de conexiones
+## Wiring Diagram
 
-![Esquemático](docs/esquematico.png)
+![Schematic](docs/esquematico.png)
 
-| Pin | Componente | Tipo |
+| Pin | Component | Type |
 |:--:|---|---|
-| D2 | Sensor PING))) (pin SIG) | Entrada / salida (disparo y eco) |
-| D3 | Pulsador con *pull-down* de 10 kΩ | Entrada digital |
-| D4 | LED verde (con 220 Ω) | Salida digital |
-| D5 | LED rojo (con 220 Ω) | Salida digital |
-| D6 | Zumbador piezoeléctrico | Salida (`tone()`) |
-| A0 | Cursor del potenciómetro | Entrada analógica (ADC de 10 bits) |
-| 5 V / GND | Alimentación del sensor y del potenciómetro; tierra común | — |
+| D2 | PING))) sensor (SIG pin) | Input / output (trigger and echo) |
+| D3 | Pushbutton with 10 kΩ *pull-down* | Digital input |
+| D4 | Green LED (with 220 Ω) | Digital output |
+| D5 | Red LED (with 220 Ω) | Digital output |
+| D6 | Piezoelectric buzzer | Output (`tone()`) |
+| A0 | Potentiometer wiper | Analog input (10-bit ADC) |
+| 5 V / GND | Power for the sensor and potentiometer; common ground | — |
 
-El pulsador conecta la entrada D3 a 5 V al presionarse; la resistencia de 10 kΩ a tierra mantiene la entrada en nivel bajo en reposo. No se usa `INPUT_PULLUP`.
+The pushbutton connects input D3 to 5 V when pressed; the 10 kΩ resistor to ground keeps the input at a low level at rest. `INPUT_PULLUP` is not used.
 
-## Instrucciones de uso
+## Usage Instructions
 
-### Cargar el código
+### Upload the Code
 
-1. Instala el [Arduino IDE](https://www.arduino.cc/en/software).
-2. Abre `monitoreo_proximidad/monitoreo_proximidad.ino`.
-3. Selecciona la placa **Arduino Uno** y el puerto correspondiente, y pulsa **Subir**.
+1. Install the [Arduino IDE](https://www.arduino.cc/en/software).
+2. Open `monitoreo_proximidad/monitoreo_proximidad.ino`.
+3. Select the **Arduino Uno** board and the corresponding port, then click **Upload**.
 
-### Probar el sistema
+### Test the System
 
-1. Abre el **Monitor Serie** a **9600 baudios**. Verás líneas como:
+1. Open the **Serial Monitor** at **9600 baud**. You will see lines like:
 
    ```
    Distance: 31 cm | Threshold: 40 cm | Buzzer: ON -> INSIDE (RED)
    ```
 
-2. Gira el **potenciómetro** para ajustar el umbral (`Threshold`).
-3. Acerca un objeto al sensor: dentro del umbral se enciende el LED rojo y suena una vez el zumbador; al alejarlo vuelve el verde y suena de nuevo.
-4. Presiona el **pulsador** para silenciar el zumbador (`MUTED`) y de nuevo para reactivarlo (`ON`).
-5. Si el sensor no recibe eco, `Distance` vale `999` y el LED queda en verde.
+2. Turn the **potentiometer** to adjust the threshold (`Threshold`).
+3. Bring an object close to the sensor: within the threshold the red LED turns on and the buzzer sounds once; when you move it away the green LED returns and the buzzer sounds again.
+4. Press the **pushbutton** to mute the buzzer (`MUTED`) and press it again to re-enable it (`ON`).
+5. If the sensor receives no echo, `Distance` is `999` and the LED stays green.
 
-### Probar en simulación
+### Test in Simulation
 
-El circuito se puede simular en Tinkercad Circuits con los mismos componentes y el mismo código.
+The circuit can be simulated in Tinkercad Circuits with the same components and the same code.
 
-<!-- Agregar aquí el enlace al proyecto de Tinkercad -->
+<!-- Add the Tinkercad project link here -->
 
-## Estructura del repositorio
+## Repository Structure
 
 ```
 .
 ├── README.md
 ├── monitoreo_proximidad/
-│   └── monitoreo_proximidad.ino   # Código fuente comentado
+│   └── monitoreo_proximidad.ino   # Commented source code
 └── docs/
-    ├── esquematico.png            # Diagrama de conexiones
-    └── simulacion_tinkercad.png   # Captura de la simulación
+    ├── esquematico.png            # Wiring diagram
+    └── simulacion_tinkercad.png   # Simulation screenshot
 ```
 
-## Limitaciones y mejoras
+## Limitations and Improvements
 
-- El lazo usa `delay()` (50 ms por ciclo y 300 ms tras cada alerta), por lo que durante ese tiempo no se lee el sensor. Se propone reemplazarlos por control temporal con `millis()`.
-- Superficies que absorben el sonido o con ángulos de incidencia grandes dispersan el eco.
-- La conversión a centímetros supone una velocidad del sonido constante (29 µs/cm).
-- Mejoras propuestas: compensación por temperatura, arreglo de sensores, pantalla OLED y envío de datos a la nube (por ejemplo con ESP32).
+- The loop uses `delay()` (50 ms per cycle and 300 ms after each alert), so the sensor is not read during that time. Replacing them with time control using `millis()` is proposed.
+- Sound-absorbing surfaces or surfaces with large incidence angles scatter the echo.
+- The conversion to centimeters assumes a constant speed of sound (29 µs/cm).
+- Proposed improvements: temperature compensation, sensor array, OLED display, and sending data to the cloud (for example, with an ESP32).
 
-## Autores
+## Authors
 
 - Juan Sebastian Rios Socha
 - Gustavo Pacheco
 - Ivan Romero
 - Santiago Cabrera
 
-Universidad de San Buenaventura, sede Bogotá. Facultad de Ingeniería.
+Universidad de San Buenaventura, Bogotá campus. Faculty of Engineering.
